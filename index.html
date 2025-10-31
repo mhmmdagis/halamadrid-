@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hala Madrid</title>
-    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="p5.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,13 +16,20 @@
   </head>
   <body>
     <audio
-      controls
       preload="auto"
       loop
       autoplay
       muted
       playsinline
       id="theme-audio"
+      aria-hidden="true"
+      style="
+        position: absolute;
+        width: 0;
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+      "
     >
       <source src="hala_madrid.mp3" type="audio/mpeg" />
       <source src="hala_madrid.mp3" type="audio/ogg" />
@@ -153,10 +160,44 @@
           window.removeEventListener("pointerdown", unlock);
           window.removeEventListener("keydown", unlock);
           window.removeEventListener("wheel", unlock, { passive: true });
+          var btn = document.getElementById("audio-toggle-btn");
+          if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
         };
         window.addEventListener("pointerdown", unlock);
         window.addEventListener("keydown", unlock);
         window.addEventListener("wheel", unlock, { passive: true });
+
+        // Jika autoplay diblokir, tampilkan tombol kecil untuk mengaktifkan audio
+        var showToggle = function () {
+          if (document.getElementById("audio-toggle-btn")) return;
+          var btn = document.createElement("button");
+          btn.id = "audio-toggle-btn";
+          btn.type = "button";
+          btn.textContent = "Aktifkan Audio";
+          btn.style.position = "fixed";
+          btn.style.right = "16px";
+          btn.style.bottom = "16px";
+          btn.style.zIndex = "9999";
+          btn.style.padding = "8px 12px";
+          btn.style.borderRadius = "999px";
+          btn.style.border = "0";
+          btn.style.background = "#1976d2";
+          btn.style.color = "#fff";
+          btn.style.boxShadow = "0 4px 12px rgba(0,0,0,.2)";
+          btn.style.cursor = "pointer";
+          btn.addEventListener("click", function () {
+            unlock();
+          });
+          document.body.appendChild(btn);
+        };
+        // Deteksi kegagalan autoplay dan tampilkan tombol
+        audio.addEventListener("play", function () {
+          var btn = document.getElementById("audio-toggle-btn");
+          if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+        });
+        setTimeout(function () {
+          if (audio.paused) showToggle();
+        }, 800);
       })();
     </script>
   </body>
